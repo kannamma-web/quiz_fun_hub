@@ -1,0 +1,266 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Fun Hub - Responsive Interactive Site</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    /* ===== Base Styles ===== */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f7fa;
+      color: #333;
+    }
+    header {
+      background: #4a90e2;
+      color: white;
+      padding: 15px;
+      text-align: center;
+    }
+    nav {
+      display: flex;
+      justify-content: center;
+      background: #357ABD;
+      padding: 10px;
+    }
+    nav button {
+      background: white;
+      color: #357ABD;
+      border: none;
+      padding: 10px 15px;
+      margin: 0 5px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    nav button:hover {
+      background: #f4f7fa;
+    }
+    section {
+      display: none;
+      padding: 20px;
+    }
+    section.active {
+      display: block;
+    }
+    .container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    /* ===== Quiz Styles ===== */
+    .quiz-question {
+      margin-bottom: 15px;
+    }
+    .quiz-options button {
+      display: block;
+      width: 100%;
+      margin: 8px 0;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: 0.3s;
+      background: #fff;
+    }
+    .quiz-options button:hover {
+      background: #f0f0f0;
+    }
+    .result {
+      font-weight: bold;
+      margin-top: 10px;
+    }
+
+    /* ===== Joke Styles ===== */
+    #jokeDisplay {
+      font-size: 1.2rem;
+      margin: 20px 0;
+      padding: 15px;
+      background: #f0f8ff;
+      border-left: 5px solid #4a90e2;
+    }
+
+    /* ===== Responsive Design ===== */
+    @media (max-width: 768px) {
+      header {
+        font-size: 1.5rem;
+      }
+      nav {
+        flex-direction: column;
+      }
+      nav button {
+        margin: 5px 0;
+        width: 100%;
+      }
+      .container {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>Fun Hub</h1>
+    <p>Quiz + Jokes + Responsive Design</p>
+  </header>
+
+  <nav>
+    <button onclick="showSection('quiz')">Quiz</button>
+    <button onclick="showSection('jokes')">Jokes</button>
+  </nav>
+
+  <!-- Quiz Section -->
+  <section id="quiz" class="active">
+    <div class="container">
+      <h2>Interactive Quiz</h2>
+      <div id="quizContainer"></div>
+      <button onclick="submitQuiz()">Submit Quiz</button>
+      <p id="quizResult" class="result"></p>
+    </div>
+  </section>
+
+  <!-- Jokes Section -->
+  <section id="jokes">
+    <div class="container">
+      <h2>Random Joke Generator</h2>
+      <div id="jokeDisplay">Click below to get a joke!</div>
+      <button onclick="getJoke()">Get New Joke</button>
+    </div>
+  </section>
+
+  <script>
+    // ===== Navigation =====
+    function showSection(id) {
+      document.querySelectorAll("section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    // ===== Quiz Logic =====
+    const quizData = [
+      {
+        question: "Which language runs in a web browser?",
+        options: ["Java", "C", "Python", "JavaScript"],
+        answer: "JavaScript"
+      },
+      {
+        question: "What does CSS stand for?",
+        options: [
+          "Central Style Sheets",
+          "Cascading Style Sheets",
+          "Computer Style Sheets",
+          "Creative Style System"
+        ],
+        answer: "Cascading Style Sheets"
+      },
+      {
+        question: "Which HTML tag is used to define an image?",
+        options: ["<img>", "<image>", "<picture>", "<src>"],
+        answer: "<img>"
+      },
+      {
+        question: "Which company developed JavaScript?",
+        options: ["Microsoft", "Netscape", "Google", "Oracle"],
+        answer: "Netscape"
+      },
+      {
+        question: "Which property in CSS is used to change text color?",
+        options: ["font-style", "text-color", "color", "background-color"],
+        answer: "color"
+      },
+      {
+        question: "What does HTML stand for?",
+        options: [
+          "Hyper Text Markup Language",
+          "Home Tool Markup Language",
+          "Hyperlinks and Text Markup Language",
+          "High Transfer Markup Language"
+        ],
+        answer: "Hyper Text Markup Language"
+      },
+      {
+        question: "Which symbol is used for comments in JavaScript?",
+        options: ["//", "<!-- -->", "#", "/* */"],
+        answer: "//"
+      },
+      {
+        question: "Which CSS property controls the size of text?",
+        options: ["font-size", "text-style", "text-size", "font-weight"],
+        answer: "font-size"
+      },
+      {
+        question: "Inside which HTML element do we put JavaScript code?",
+        options: ["<script>", "<js>", "<javascript>", "<code>"],
+        answer: "<script>"
+      },
+      {
+        question: "Which keyword is used to declare a constant in JavaScript?",
+        options: ["let", "var", "const", "define"],
+        answer: "const"
+      }
+    ];
+
+    const quizContainer = document.getElementById("quizContainer");
+    let selectedAnswers = {};
+
+    function loadQuiz() {
+      quizContainer.innerHTML = "";
+      quizData.forEach((q, index) => {
+        let questionHTML = `
+          <div class="quiz-question">
+            <p><b>Q${index + 1}:</b> ${q.question}</p>
+            <div class="quiz-options" id="options-${index}">
+              ${q.options.map(opt =>
+                `<button onclick="selectOption(${index}, '${opt.replace(/'/g, "\\'")}', event)">${opt}</button>`
+              ).join("")}
+            </div>
+          </div>
+        `;
+        quizContainer.innerHTML += questionHTML;
+      });
+    }
+
+    function selectOption(qIndex, answer, event) {
+      selectedAnswers[qIndex] = answer;
+
+      const optionsDiv = document.getElementById(`options-${qIndex}`);
+      [...optionsDiv.children].forEach(btn => btn.style.background = "#fff");
+      event.target.style.background = "#d1e7fd";
+    }
+
+    function submitQuiz() {
+      let score = 0;
+      quizData.forEach((q, i) => {
+        if (selectedAnswers[i] === q.answer) {
+          score++;
+        }
+      });
+      document.getElementById("quizResult").textContent =
+        `You scored ${score} out of ${quizData.length}!`;
+    }
+
+    // ===== Joke API Logic =====
+    async function getJoke() {
+      try {
+        const res = await fetch("https://official-joke-api.appspot.com/jokes/random");
+        const data = await res.json();
+        document.getElementById("jokeDisplay").textContent =
+          `${data.setup} ... ${data.punchline}`;
+      } catch (error) {
+        document.getElementById("jokeDisplay").textContent = "Failed to fetch a joke.";
+      }
+    }
+
+    // Load quiz on page load
+    loadQuiz();
+  </script>
+
+</body>
+</html>
